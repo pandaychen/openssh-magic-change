@@ -12,6 +12,8 @@
 ## 值得研究的点
 -   证书认证
 -   ProxyCommand实现
+-   OPENSSH+RBAC
+
 
 ##  参考资料
 <br>

@@ -60,6 +60,8 @@ struct Session {
 		char	*name;
 		char	*val;
 	} *env;
+	
+	char *token;
 };
 
 void	 do_authenticated(Authctxt *);

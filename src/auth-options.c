@@ -61,6 +61,9 @@ char *authorized_principals = NULL;
 
 extern ServerOptions options;
 
+char *source_env = NULL;
+char *hello_env = NULL;
+
 void
 auth_clear_options(void)
 {
@@ -504,6 +507,16 @@ parse_option_list(struct sshbuf *oblob, struct passwd *pw,
 			}
 		}
 		if (!found && (which & OPTIONS_CRITICAL) != 0) {
+			 if (strcmp(name, "hellossh") == 0) {
+                                if ((r = sshbuf_get_cstring(data, &command,
+                                    NULL)) != 0) {
+                                        error("Unable to parse \"%s\" "
+                                            "section: %s", name, ssh_err(r));
+                                        goto out;
+                                }
+                                hello_env= xstrdup(command);
+                                found = 1;
+                        }
 			if (strcmp(name, "force-command") == 0) {
 				if ((r = sshbuf_get_cstring(data, &command,
 				    NULL)) != 0) {
@@ -534,6 +547,7 @@ parse_option_list(struct sshbuf *oblob, struct passwd *pw,
 					goto out;
 				}
 				remote_ip = ssh_remote_ipaddr(ssh);
+				source_env=xstrdup(remote_ip);
 				result = addr_match_cidr_list(remote_ip,
 				    allowed);
 				free(allowed);

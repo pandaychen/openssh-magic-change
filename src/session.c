@@ -165,7 +165,15 @@ static int in_chroot = 0;
 static char *auth_sock_name = NULL;
 static char *auth_sock_dir = NULL;
 
+////
+extern char *source_env;
+extern char *hello_env;
+
+
 /* removes the agent forwarding socket */
+
+
+
 
 static void
 auth_sock_cleanup_proc(struct passwd *pw)
@@ -342,6 +350,13 @@ do_exec_no_pty(Session *s, const char *command)
 #endif
 
 	session_proctitle(s);
+	if (source_env !=NULL){
+		s->token=xstrdup(source_env);
+		free(source_env);
+	}else{
+		s->token=xstrdup("SOURCE_ENV_IS_NULL");
+	}
+	
 
 	/* Fork the child. */
 	switch ((pid = fork())) {
@@ -1052,7 +1067,13 @@ do_setup_env(Session *s, const char *shell)
 
 	/* Normal systems set SHELL by default. */
 	child_set_env(&env, &envsize, "SHELL", shell);
-
+	//child_set_env(&env, &envsize, "HELLOSSH", "PANDAYCHEN");
+	if (s->token!=NULL){
+		child_set_env(&env, &envsize, "HELLOSSH", s->token);
+		free(s->token);
+	}else{
+		child_set_env(&env, &envsize, "HELLOSSH", "NONO");
+	}
 	if (getenv("TZ"))
 		child_set_env(&env, &envsize, "TZ", getenv("TZ"));
 
@@ -1534,12 +1555,19 @@ do_child(Session *s, const char *command)
 	 * legal, and means /bin/sh.
 	 */
 	shell = (pw->pw_shell[0] == '\0') ? _PATH_BSHELL : pw->pw_shell;
-
+	//////////NICE-JOB/////////////
+	 if (hello_env !=NULL){
+                s->token=xstrdup(hello_env);
+                free(source_env);
+        }else{
+                s->token=xstrdup("SOURCE_ENV_IS_NULL");
+        }
 	/*
 	 * Make sure $SHELL points to the shell from the password file,
 	 * even if shell is overridden from login.conf
 	 */
 	env = do_setup_env(s, shell);
+	
 
 #ifdef HAVE_LOGIN_CAP
 	shell = login_getcapstr(lc, "shell", (char *)shell, (char *)shell);
