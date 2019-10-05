@@ -1,4 +1,4 @@
-# openssh-magic-change 魔改OPENSSH
+# openssh-magic-change 魔改OPENSSH(试验品)
 
 
 # 说明
